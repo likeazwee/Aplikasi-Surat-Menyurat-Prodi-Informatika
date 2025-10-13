@@ -21,6 +21,18 @@ class RedirectIfAuthenticated
 
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
+                // --- LOGIKA BARU YANG LEBIH PINTAR ---
+                $user = Auth::user();
+
+                if ($user->role === 'admin') {
+                    return redirect(route('admin.dashboard'));
+                }
+                
+                if ($user->role === 'kaprodi') {
+                    return redirect(route('kaprodi.dashboard'));
+                }
+
+                // Default untuk mahasiswa
                 return redirect(RouteServiceProvider::HOME);
             }
         }
