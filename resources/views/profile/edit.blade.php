@@ -1,29 +1,58 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Profile') }}
-        </h2>
-    </x-slot>
+@extends('layouts.profile-admin')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.update-profile-information-form')
-                </div>
-            </div>
+@section('content')
+<div class="max-w-4xl mx-auto bg-white rounded-lg shadow p-8">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-6 border-b pb-3">Profil Akun</h2>
 
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.update-password-form')
-                </div>
-            </div>
-
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.delete-user-form')
-                </div>
-            </div>
+    {{-- Update informasi profil --}}
+    <div class="mb-10">
+        <h3 class="text-lg font-semibold text-blue-900 mb-3">Informasi Pengguna</h3>
+        <div class="bg-gray-50 p-6 rounded-lg border">
+            @include('profile.partials.update-profile-information-form')
         </div>
     </div>
-</x-app-layout>
+
+    {{-- Update password --}}
+    <div class="mb-10">
+        <h3 class="text-lg font-semibold text-blue-900 mb-3">Ubah Password</h3>
+        <div class="bg-gray-50 p-6 rounded-lg border">
+            @include('profile.partials.update-password-form')
+        </div>
+    </div>
+
+    {{-- Hapus akun --}}
+    <div>
+        <h3 class="text-lg font-semibold text-red-600 mb-3">Hapus Akun</h3>
+        <div class="bg-red-50 p-6 rounded-lg border border-red-200">
+            @include('profile.partials.delete-user-form')
+        </div>
+    </div>
+</div>
+
+{{-- Efek animasi & hover ringan --}}
+<style>
+    button {
+        transition: all 0.2s ease-in-out;
+    }
+    button:hover {
+        transform: scale(1.05);
+    }
+</style>
+
+{{-- SweetAlert untuk notifikasi sukses --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const successMessage = "{{ session('status') }}";
+    if (successMessage) {
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: successMessage,
+            confirmButtonColor: '#1e3a8a',
+            confirmButtonText: 'OK'
+        });
+    }
+});
+</script>
+@endsection
