@@ -1,5 +1,7 @@
 @extends('layouts.admin')
 
+@section('header', 'Daftar Pengajuan Surat')
+
 @section('content')
 <div class="bg-white rounded-lg shadow p-6">
     <h3 class="text-lg font-semibold text-gray-700 mb-4">Daftar Pengajuan Surat Masuk</h3>
