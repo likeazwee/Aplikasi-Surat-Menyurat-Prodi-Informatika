@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }} - Admin</title>
+    <title>{{ config('app.name', 'Laravel') }} - Profile</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -21,7 +21,7 @@
         <aside class="bg-blue-900 text-white w-64 space-y-6 py-6 px-3 hidden md:block">
             <div class="flex items-center space-x-3 px-4">
                 <img src="{{ asset('images/logounib.png') }}" alt="Logo UNIB" class="h-14 w-14">
-                <h1 class="text-lg font-bold">Admin Prodi</h1>
+                <h1 class="text-lg font-bold">Profile</h1>
             </div>
 
             <nav class="mt-6">

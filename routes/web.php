@@ -41,6 +41,7 @@ Route::middleware(['auth', 'verified', 'role:mahasiswa'])->group(function () {
 // --- ROUTE KHUSUS UNTUK KAPRODI ---
 Route::middleware(['auth', 'verified', 'role:kaprodi'])->prefix('kaprodi')->name('kaprodi.')->group(function () {
     Route::get('/dashboard', [KaprodiDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/kaprodi/profile', [ProfileController::class, 'edit'])->name('kaprodi.profile.edit');
 });
 
 
