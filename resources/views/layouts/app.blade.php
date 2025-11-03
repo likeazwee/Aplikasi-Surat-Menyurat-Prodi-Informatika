@@ -24,13 +24,32 @@
                     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                         {{ $header }}
                     </div>
+            {{-- PERUBAHAN: Tambahkan @elseif untuk mendukung @section('header') --}}
+            @elseif (isset($attributes['header']))
+                <header class="bg-white shadow">
+                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                        {{ $attributes['header'] }}
+                    </div>
+                </header>
+            @elseif (View::hasSection('header'))
+                <header class="bg-white shadow">
+                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                        @yield('header')
+                    </div>
                 </header>
             @endif
 
+
             <!-- Page Content -->
             <main>
-                {{ $slot }}
+                {{-- 👇 INI ADALAH PERUBAHAN UTAMA 👇 --}}
+                @if (isset($slot))
+                    {{ $slot }}
+                @else
+                    @yield('content')
+                @endif
             </main>
         </div>
     </body>
 </html>
+

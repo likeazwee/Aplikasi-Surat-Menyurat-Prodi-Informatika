@@ -27,7 +27,9 @@ class PengajuanSurat extends Model
         'jenis_surat_id',
         'keterangan',
         'status',
-        // Tambahkan kolom lain yang boleh diisi dari form di sini
+        'file_path', // <-- TAMBAHKAN BARIS INI
+        'approver_id', // <-- Tambahkan ini juga untuk masa depan
+        'tanggal_diproses', // <-- Tambahkan ini juga
     ];
 
     /**
@@ -44,6 +46,14 @@ class PengajuanSurat extends Model
     public function jenisSurat(): BelongsTo
     {
         return $this->belongsTo(JenisSurat::class, 'jenis_surat_id');
+    }
+
+    /**
+     * Mendefinisikan relasi: Satu PengajuanSurat bisa memiliki banyak Komentar.
+     */
+    public function komentars()
+    {
+        return $this->hasMany(Komentar::class, 'pengajuan_surat_id');
     }
 }
 
