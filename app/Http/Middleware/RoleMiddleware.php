@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Middleware;
+namespace App\Http\Middleware; // <-- PERBAIKI BARIS INI
 
 use Closure;
 use Illuminate\Http\Request;
@@ -31,3 +31,4 @@ class RoleMiddleware
         return back()->with('error', 'Anda tidak memiliki akses ke halaman ini.');
     }
 }
+

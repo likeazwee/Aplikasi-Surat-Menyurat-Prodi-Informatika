@@ -58,6 +58,17 @@
                     <input id="prodi" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500" type="text" name="prodi" value="{{ old('prodi', $user->profile->prodi ?? '') }}" />
                 </div>
 
+                {{-- 👇 FIELD BARU DITAMBAHKAN DI SINI 👇 --}}
+                <!-- Jenis Kelamin -->
+                <div class="mt-4">
+                    <label for="jenis_kelamin" class="block text-sm font-medium text-gray-700">Jenis Kelamin (untuk Mahasiswa)</label>
+                    <select id="jenis_kelamin" name="jenis_kelamin" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option value="" disabled @selected(old('jenis_kelamin', $user->profile->jenis_kelamin ?? '') == '')>-- Pilih Jenis Kelamin --</option>
+                        <option value="Laki-laki" @selected(old('jenis_kelamin', $user->profile->jenis_kelamin ?? '') == 'Laki-laki')>Laki-laki</option>
+                        <option value="Perempuan" @selected(old('jenis_kelamin', $user->profile->jenis_kelamin ?? '') == 'Perempuan')>Perempuan</option>
+                    </select>
+                </div>
+
                 <!-- NIP -->
                 <div class="mt-4">
                     <label for="nip" class="block text-sm font-medium text-gray-700">NIP (untuk Admin/Kaprodi)</label>
@@ -84,4 +95,3 @@
         </div>
     </div>
 @endsection
-
