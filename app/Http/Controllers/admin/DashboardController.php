@@ -61,9 +61,6 @@ class DashboardController extends Controller
         return redirect()->route('admin.dashboard')->with('success', 'Surat berhasil disetujui.');
     }
 
-    /**
-     * Menolak pengajuan surat.
-     */
     public function reject(PengajuanSurat $surat)
     {
         $surat->update([
@@ -74,9 +71,6 @@ class DashboardController extends Controller
         return redirect()->route('admin.dashboard')->with('success', 'Surat berhasil ditolak.');
     }
 
-    /**
-     * Generate dan download surat dalam format DOCX.
-     */
     public function downloadSurat(PengajuanSurat $surat)
     {
         // 1. Validasi
@@ -90,8 +84,8 @@ class DashboardController extends Controller
         $profile = $user->profile;
         $jenisSurat = $surat->jenisSurat;
 
-        // 3. Tentukan path template SECARA DINAMIS dari database
-        $templateFileName = $jenisSurat->template_file; // Cth: "SKL.docx"
+        // 3. Tentukan path template 
+        $templateFileName = $jenisSurat->template_file; 
         
         if (empty($templateFileName)) {
             return redirect()->route('admin.dashboard')->with('error', 'Template DOCX untuk jenis surat ini belum diatur di database.');
@@ -109,12 +103,9 @@ class DashboardController extends Controller
 
             // Ambil tanggal diproses, format ke Bahasa Indonesia
             $tanggalPersetujuan = $surat->tanggal_diproses
-                                  ? $surat->tanggal_diproses->locale('id')->translatedFormat('d F Y')
-                                  : Carbon::now()->locale('id')->translatedFormat('d F Y');
+                                ? $surat->tanggal_diproses->locale('id')->translatedFormat('d F Y')
+                                : Carbon::now()->locale('id')->translatedFormat('d F Y');
 
-            // --- PERBAIKAN LOGIKA PENGISIAN DATA ---
-
-            // A. Siapkan data standar (dari profil)
             $data = [
                 'nama_mahasiswa' => $user->name ?? '',
                 'jenis_kelamin' => $profile->jenis_kelamin ?? '',
@@ -123,15 +114,15 @@ class DashboardController extends Controller
                 'tanggal_pengajuan' => $surat->created_at->format('d F Y') ?? '',
                 'tempat_terbit' => 'Bengkulu', 
                 'tanggal_persetujuan' => $tanggalPersetujuan,
-                'nim' => $profile->nim ?? '', // Fallback ke profil
-                'npm' => $profile->nim ?? '', // Fallback ke profil
+                'nim' => $profile->nim ?? '', 
+                'npm' => $profile->nim ?? '', 
             ];
 
             // B. Siapkan data dinamis (dari form manual)
             $extraData = $surat->extra_data ?? [];
 
             // C. Gabungkan data. Data dari $extraData (input manual) AKAN MENIMPA data standar.
-            // Ini MEMASTIKAN input manual ${npm} Anda digunakan.
+            // Ini MEMASTIKAN input manual ${npm} digunakan.
             $finalData = array_merge($data, $extraData);
 
             // D. Isi template dengan data final
