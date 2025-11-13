@@ -24,9 +24,31 @@
                 <h1 class="text-lg font-bold">Profile</h1>
             </div>
 
+            @php
+                use Illuminate\Support\Facades\Auth;
+
+                $user = Auth::user();
+                // Tentukan route dashboard sesuai peran user
+                if ($user) {
+                    switch ($user->role) {
+                        case 'admin':
+                            $dashboardRoute = route('admin.dashboard');
+                            break;
+                        case 'kaprodi':
+                            $dashboardRoute = route('kaprodi.dashboard');
+                            break;
+                        default:
+                            $dashboardRoute = route('dashboard');
+                            break;
+                    }
+                } else {
+                    $dashboardRoute = route('dashboard');
+                }
+            @endphp
+
             <nav class="mt-6">
-                <a href="{{ route('admin.dashboard') }}"
-                   class="flex items-center py-2 px-4 rounded hover:bg-blue-800 {{ request()->routeIs('admin.dashboard') ? 'bg-blue-800' : '' }}">
+                <a href="{{ $dashboardRoute }}"
+                   class="flex items-center py-2 px-4 rounded hover:bg-blue-800 {{ request()->is('dashboard') || request()->is('admin/dashboard') || request()->is('kaprodi/dashboard') ? 'bg-blue-800' : '' }}">
                     <span class="ml-2 font-semibold">Dashboard</span>
                 </a>
             </nav>
@@ -46,11 +68,12 @@
             <!-- Header -->
             <header class="flex items-center justify-between bg-white px-6 py-4 shadow">
                 <h2 class="text-xl font-semibold text-gray-700">Atur Profil</h2>
+
                 <!-- Profile Button -->
                 <a href="{{ route('profile.edit') }}"
-                class="flex items-center space-x-2 group px-3 py-2 rounded-lg transition transform hover:scale-105">
-                    <img class="h-9 w-9 rounded-full border border-gray-300  transition transform group-hover:scale-110"
-                        src="{{ asset('images/profile.logo.png') }}" alt="Profile">
+                   class="flex items-center space-x-2 group px-3 py-2 rounded-lg transition transform hover:scale-105">
+                    <img class="h-9 w-9 rounded-full border border-gray-300 transition transform group-hover:scale-110"
+                         src="{{ asset('images/profile.logo.png') }}" alt="Profile">
                     <span class="text-gray-800 font-medium group-hover:text-blue-700 transition">
                         {{ Auth::user()->name ?? 'Admin' }}
                     </span>
@@ -63,6 +86,7 @@
             </main>
         </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 </html>
