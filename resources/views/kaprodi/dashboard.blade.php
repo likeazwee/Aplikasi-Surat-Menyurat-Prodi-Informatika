@@ -1,154 +1,204 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Kaprodi</title>
+<x-app-layout>
+    {{-- 🌫️ Background Animasi Silver Classy --}}
     <style>
-        /* Animasi Background Modern */
-        .animated-background {
-            background: linear-gradient(270deg, #0a192f, #1a365d, #2563eb, #0a192f);
+        @keyframes shimmer {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .animated-bg {
+            background: linear-gradient(
+                -45deg,
+                
+                #b2b2b2ff,
+    
+                #b2adadff
+            );
             background-size: 400% 400%;
-            animation: gradientMove 15s ease infinite;
+            animation: shimmer 15s ease infinite;
         }
 
-        @keyframes gradientMove {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        .card-silver {
+            background: linear-gradient(145deg, #2f2f2f, #3d3d3d);
+            border: 1px solid #555555ff;
         }
 
-        /* Efek Hover Modern */
-        .navbar-link:hover {
-            transform: scale(1.05);
-            transition: all 0.3s ease;
+        .card-silver:hover {
+            transform: translateY(-3px);
+            background: linear-gradient(145deg, #404040, #505050);
         }
 
-        .status-badge {
-            @apply px-3 py-1 text-xs font-semibold rounded-full;
+        .text-silver {
+            color: #e5e5e5;
         }
 
-        .lampiran-button {
-            @apply inline-flex items-center px-3 py-1 bg-blue-500 text-white text-sm font-medium rounded-full shadow hover:bg-blue-600 transition-all duration-200;
+        .btn-silver {
+            background: linear-gradient(145deg, #7f7f7f, #bcbcbc);
+            color: #1a1a1a;
+        }
+
+        .btn-silver:hover {
+            background: linear-gradient(145deg, #bcbcbc, #e0e0e0);
         }
     </style>
-</head>
 
-<body class="antialiased">
-<x-app-layout>
-    {{-- HEADER --}}
-    <x-slot name="header">
-        <div class="flex justify-between items-center bg-gradient-to-r from-blue-900 to-blue-700 p-6 rounded-b-xl shadow-lg transition-all duration-300 hover:shadow-xl">
-            <div class="flex items-center gap-2 text-blue-100">
-                <svg class="h-6 w-6 animate-pulse-slow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M3 12l2-2m0 0l7-7 7 7m-9 9v-6h4v6m1 0l-2 2m2-2l2-2"/>
-                </svg>
-                <h2 class="font-semibold text-xl navbar-link">
-                    {{ __('Dashboard Kaprodi - Daftar Pengajuan Surat Mahasiswa') }}
-                </h2>
+    <div class="min-h-screen animated-bg py-10 text-white transition-all duration-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            {{-- 🔍 Formulir Pencarian & Filter --}}
+<div class="bg-blue-900/80 backdrop-blur-md border border-blue-300/20 rounded-2xl shadow-md mb-8">
+    <div class="p-6 text-white rounded-2xl">
+        <form action="{{ route('kaprodi.dashboard') }}" method="GET"
+              class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+
+            {{-- 🔎 Nama Mahasiswa --}}
+            <div>
+                <label for="search_nama" class="block text-sm font-semibold text-blue-100 mb-1">
+                    Nama Mahasiswa
+                </label>
+                <input type="text" name="search_nama" id="search_nama"
+                       value="{{ request('search_nama') }}"
+                       placeholder="Cari nama mahasiswa..."
+                       class="w-full px-4 py-2 bg-blue-950/40 border border-blue-400/30 text-white rounded-lg 
+                              placeholder-blue-200 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition">
             </div>
 
-            {{-- Tombol Refresh --}}
-            <a href="{{ route('kaprodi.dashboard') }}"
-               class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-400 text-white font-semibold text-xs rounded-full shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300">
-                Refresh Data
-            </a>
-        </div>
-    </x-slot>
-
-    {{-- BODY --}}
-    <div class="relative min-h-screen animated-background overflow-hidden py-12 px-6">
-        <div class="max-w-7xl mx-auto space-y-8">
-
-            {{-- Pencarian --}}
-            <div class="bg-white/90 rounded-xl shadow-lg p-6 backdrop-blur-md hover:shadow-xl transition-all duration-300">
-                <form action="{{ route('kaprodi.dashboard') }}" method="GET">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-                        <div>
-                            <label for="search_nama" class="block text-sm font-medium text-blue-900">Nama Mahasiswa</label>
-                            <input type="text" name="search_nama" id="search_nama" value="{{ request('search_nama') }}"
-                                   class="mt-1 block w-full border border-blue-200 rounded-md shadow-sm focus:ring-blue-400 focus:border-blue-400">
-                        </div>
-                        <div>
-                            <label for="search_jenis" class="block text-sm font-medium text-blue-900">Jenis Surat</label>
-                            <input type="text" name="search_jenis" id="search_jenis" value="{{ request('search_jenis') }}"
-                                   class="mt-1 block w-full border border-blue-200 rounded-md shadow-sm focus:ring-blue-400 focus:border-blue-400">
-                        </div>
-                        <div>
-                            <button type="submit"
-                                    class="inline-flex items-center px-5 py-2 bg-gradient-to-r from-blue-700 to-blue-500 text-white font-semibold text-sm rounded-md shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300">
-                                🔍 Cari
-                            </button>
-                        </div>
-                    </div>
-                </form>
+            {{-- 📨 Jenis Surat --}}
+            <div>
+                <label for="search_jenis" class="block text-sm font-semibold text-blue-100 mb-1">
+                    Jenis Surat
+                </label>
+                <input type="text" name="search_jenis" id="search_jenis"
+                       value="{{ request('search_jenis') }}"
+                       placeholder="Cari jenis surat..."
+                       class="w-full px-4 py-2 bg-blue-950/40 border border-blue-400/30 text-white rounded-lg 
+                              placeholder-blue-200 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition">
             </div>
 
-            
+            {{-- ⚙ Filter Status --}}
+            <div>
+                <label for="status" class="block text-sm font-semibold text-blue-100 mb-1">
+                    Filter Status
+                </label>
+                <select name="status" id="status"
+                        class="w-full px-4 py-2 bg-blue-950/40 border border-blue-400/30 text-white rounded-lg 
+                               focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition">
+                    <option value="">Semua Status</option>
+                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
+                    <option value="disetujui" {{ request('status') == 'disetujui' ? 'selected' : '' }}>Disetujui</option>
+                    <option value="ditolak" {{ request('status') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
+                </select>
+            </div>
 
-            {{-- Tabel Data --}}
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500">
-    <div class="p-6 bg-gray-100">
-        <h3 class="text-lg font-medium text-gray-700 flex items-center gap-2">
-            <svg class="h-6 w-6 text-gray-600 animate-pulse" xmlns="http://www.w3.org/2000/svg" fill="none"
-                 viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2"/>
-            </svg>
-            Daftar Pengajuan Surat Mahasiswa
-        </h3>
-    </div>
-
-    <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-            <tr>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Tanggal</th>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Nama Mahasiswa</th>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Jenis Surat</th>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Lampiran</th>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Status</th>
-            </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-100">
-            @forelse ($pengajuanSurats as $surat)
-                <tr class="hover:bg-gray-50 transition-all duration-300">
-                    <td class="px-6 py-4 text-sm text-gray-600">{{ $surat->created_at->format('d/m/Y') }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-800 font-semibold">{{ $surat->user->name }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-700">{{ $surat->jenisSurat->nama_surat }}</td>
-                    <td class="px-6 py-4 text-sm">
-                        @if ($surat->file_path)
-                            <a href="{{ Storage::url($surat->file_path) }}" target="_blank"
-                               class="lampiran-button">
-                                📎 Lihat File
-                            </a>
-                        @else
-                            <span class="text-xs text-gray-400">-</span>
-                        @endif
-                    </td>
-                    <td class="px-6 py-4 text-sm">
-                        @if($surat->status == 'pending')
-                            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-200 text-yellow-800 animate-pulse">Pending</span>
-                        @elseif($surat->status == 'disetujui')
-                            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-200 text-green-800">Disetujui</span>
-                        @else
-                            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-red-200 text-red-800">Ditolak</span>
-                        @endif
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="5" class="text-center text-gray-500 py-4">Tidak ada pengajuan surat ditemukan.</td>
-                </tr>
-            @endforelse
-            </tbody>
-        </table>
+            {{-- 🔘 Tombol Cari --}}
+            <div class="flex sm:col-span-2 lg:col-span-1 items-end">
+                <button type="submit"
+                        class="w-full bg-blue-700 hover:bg-blue-600 text-white font-semibold py-2.5 rounded-lg 
+                               shadow-md transition-all duration-300 transform hover:scale-[1.02]">
+                    Cari
+                </button>
+            </div>
+        </form>
     </div>
 </div>
+
+
+            {{-- 📦 Kartu Data Pengajuan --}}
+<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    @forelse ($pengajuanSurats as $surat)
+        <div class="group rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 
+                    bg-blue-900/80 backdrop-blur-md border border-blue-300/20 hover:bg-blue-900/90">
+            <div class="p-5 text-white">
+                <div class="flex justify-between items-start mb-3">
+                    <h2 class="text-lg font-bold text-white group-hover:text-blue-100 transition">
+                        {{ $surat->jenisSurat->nama_surat }}
+                    </h2>
+                    <span class="text-sm text-blue-200">{{ $surat->created_at->format('d M Y') }}</span>
+                </div>
+
+                <div class="space-y-1 mb-4">
+                    <p class="font-medium">👤 {{ $surat->user->name }}</p>
+                    <p class="text-sm truncate">📎
+                        @if ($surat->file_path)
+                            <a href="{{ Storage::url($surat->file_path) }}" target="_blank"
+                               class="text-blue-100 hover:text-white font-medium underline">
+                                Lihat Lampiran
+                            </a>
+                        @else
+                            <span class="text-blue-200/70 italic">Tidak ada lampiran</span>
+                        @endif
+                    </p>
+                </div>
+
+                {{-- 🔘 Status Surat --}}
+                <div>
+                    @if($surat->status == 'pending')
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800 animate-pulse">
+                            ⏳ Pending
+                        </span>
+                    @elseif($surat->status == 'disetujui')
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                            ✅ Disetujui
+                        </span>
+                    @else
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">
+                            ❌ Ditolak
+                        </span>
+                    @endif
+                </div>
+            </div>
+        </div>
+    @empty
+        <div class="col-span-full bg-blue-900/40 border border-blue-700/30 rounded-2xl shadow-sm p-8 text-center text-blue-100 italic">
+            Tidak ada data yang cocok dengan filter Anda.
+        </div>
+    @endforelse
+</div>
+
+
+
+            {{-- 📄 Pagination --}}
+            @if ($pengajuanSurats->hasPages())
+                <div class="flex justify-end mt-10">
+                    <div class="flex items-center space-x-2 bg-[#2a2a2a]/60 border border-gray-700 rounded-full px-4 py-2 shadow-lg backdrop-blur-sm">
+                        @if ($pengajuanSurats->onFirstPage())
+                            <span class="px-3 py-1 text-gray-500/70 rounded-full text-sm">‹</span>
+                        @else
+                            <a href="{{ $pengajuanSurats->previousPageUrl() }}"
+                               class="px-3 py-1 bg-gray-600 text-white rounded-full text-sm hover:bg-gray-500 transition">
+                                ‹
+                            </a>
+                        @endif
+
+                        @foreach ($pengajuanSurats->getUrlRange(1, $pengajuanSurats->lastPage()) as $page => $url)
+                            @if ($page == $pengajuanSurats->currentPage())
+                                <span class="px-3 py-1 bg-gray-400 text-black rounded-full text-sm font-semibold shadow-md">{{ $page }}</span>
+                            @else
+                                <a href="{{ $url }}" class="px-3 py-1 bg-[#1e1e1e] text-gray-300 rounded-full text-sm border border-gray-600 hover:bg-gray-700 transition">
+                                    {{ $page }}
+                                </a>
+                            @endif
+                        @endforeach
+
+                        @if ($pengajuanSurats->hasMorePages())
+                            <a href="{{ $pengajuanSurats->nextPageUrl() }}"
+                               class="px-3 py-1 bg-gray-600 text-white rounded-full text-sm hover:bg-gray-500 transition">
+                                ›
+                            </a>
+                        @else
+                            <span class="px-3 py-1 text-gray-500/70 rounded-full text-sm">›</span>
+                        @endif
+                    </div>
+                </div>
+            @endif
 
         </div>
     </div>
 </x-app-layout>
-</body>
-</html>
