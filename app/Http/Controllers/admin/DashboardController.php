@@ -70,9 +70,6 @@ class DashboardController extends Controller
         return redirect()->route('admin.dashboard')->with('success', 'Surat berhasil disetujui.');
     }
 
-    /**
-     * Menolak pengajuan surat.
-     */
     public function reject(PengajuanSurat $surat)
     {
         $surat->update([
