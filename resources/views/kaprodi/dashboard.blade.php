@@ -1,23 +1,22 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Kaprodi</title>
+<x-app-layout>
+    {{-- 🌫️ Background Animasi Silver Classy --}}
     <style>
         .animated-background {
             background: linear-gradient(270deg, #0a192f, #1a365d, #2563eb, #0a192f);
             background-size: 400% 400%;
-            animation: gradientMove 15s ease infinite;
+            animation: shimmer 15s ease infinite;
         }
 
-        @keyframes gradientMove {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        .card-silver {
+            background: linear-gradient(145deg, #2f2f2f, #3d3d3d);
+            border: 1px solid #555555ff;
+        }
+
+        .card-silver:hover {
+            transform: translateY(-3px);
+            background: linear-gradient(145deg, #404040, #505050);
         }
     </style>
-</head>
 
 <body class="antialiased">
 <x-app-layout>
@@ -162,5 +161,3 @@
         </div>
     </div>
 </x-app-layout>
-</body>
-</html>

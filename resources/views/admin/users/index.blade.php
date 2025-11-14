@@ -3,80 +3,147 @@
 @section('header', 'Kelola Pengguna')
 
 @section('content')
-    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-        <div class="p-6 bg-blue-50">
-            <h3 class="text-lg font-medium text-blue-700 flex items-center gap-2">
-                <svg class="h-6 w-6 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M15 21a6 6 0 00-9-5.197M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                Daftar Pengguna Sistem
-            </h3>
+<div class="py-10 px-6">
+    <h2 class="text-4xl font-bold text-white mb-8 text-center drop-shadow-md"
+    style="
+        -webkit-text-stroke-width: 1px; /* Ketebalan garis tepi */
+        -webkit-text-stroke-color: black; /* Warna garis tepi */
+        color: white; /* Warna isi teks tetap putih */
+    ">
+    Daftar Pengguna Sistem
+</h2>
+
+
+    <!-- Notifikasi -->
+    @if (session('success'))
+        <div class="mb-6 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-xl shadow-sm" role="alert">
+            <p>{{ session('success') }}</p>
         </div>
+    @endif
 
-        @if (session('success'))
-            <div class="m-6 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-xl" role="alert">
-                <p>{{ session('success') }}</p>
+    <!-- Formulir Pencarian -->
+<div class="backdrop-blur-md bg-blue-900/60 border border-white/10 rounded-2xl shadow-lg p-6 mb-10">
+    <form method="GET" action="{{ route('admin.users.index') }}">
+        <div class="flex flex-wrap items-end gap-4 justify-center">
+            <div class="w-full sm:w-1/2">
+                <label for="search" class="block text-sm font-medium text-gray-200">Cari Nama atau Email</label>
+                <input type="text" name="search" id="search" placeholder="Nama atau Email..."
+                    class="mt-1 block w-full bg-white/10 text-white placeholder-gray-300 border border-white/20 rounded-lg shadow-sm focus:border-blue-400 focus:ring-blue-400"
+                    value="{{ request('search') }}">
             </div>
-        @endif
+            <button type="submit"
+                class="inline-flex items-center px-6 py-2 bg-gradient-to-r from-blue-900 to-blue-700 text-white font-semibold text-sm rounded-full shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300">
+                Cari
+            </button>
+        </div>
+    </form>
+</div>
 
-        <!-- Formulir Pencarian -->
-        <form method="GET" action="{{ route('admin.users.index') }}" class="p-6 border-b border-blue-100">
-             <div class="flex flex-wrap items-end gap-4">
-                <div class="flex-1 min-w-[250px]">
-                    <label for="search" class="block text-sm font-medium text-gray-700">Cari Nama atau Email</label>
-                    <input type="text" name="search" id="search" placeholder="Nama atau Email..." class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500" value="{{ request('search') }}">
+
+    <!-- Grid Card Pengguna -->
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        @forelse ($users as $user)
+            <div 
+                onclick="openModal('{{ $user->id }}')"
+                class="relative backdrop-blur-md bg-blue-900/60 border border-white/10 text-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] cursor-pointer p-6">
+                
+                <!-- Foto Profil -->
+                <div class="flex items-center space-x-4 mb-4">
+                    <div class="w-14 h-14 rounded-full bg-blue-500/60 flex items-center justify-center text-white font-bold text-xl shadow-md">
+                        {{ strtoupper(substr($user->name, 0, 1)) }}
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold">{{ $user->name }}</h3>
+                        <p class="text-sm text-gray-300">{{ $user->email }}</p>
+                    </div>
                 </div>
-                <button type="submit" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-700 to-blue-500 text-white font-semibold text-xs rounded-full shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300 h-10">
-                    Cari
-                </button>
-            </div>
-        </form>
 
-        <!-- Tabel Pengguna -->
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-blue-100">
-                <thead class="bg-blue-50">
-                    <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-600 uppercase">Nama</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-600 uppercase">Email</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-600 uppercase">Role</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-600 uppercase">NIM/NIP</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-600 uppercase">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-blue-50">
-                    @forelse ($users as $user)
-                        <tr class="hover:bg-blue-50/50 transition-all duration-300">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $user->name }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ $user->email }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-3 py-1 text-xs font-semibold rounded-full 
-                                    @if($user->role == 'admin') bg-red-100 text-red-800 @endif
-                                    @if($user->role == 'kaprodi') bg-yellow-100 text-yellow-800 @endif
-                                    @if($user->role == 'mahasiswa') bg-green-100 text-green-800 @endif">
-                                    {{ ucfirst($user->role) }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ $user->profile->nim ?? $user->profile->nip ?? '-' }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a href="{{ route('admin.users.edit', $user) }}" class="text-blue-700 hover:text-blue-900">Ubah</a>
-                                <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="inline-block ml-4" onsubmit="return confirm('Apakah Anda yakin ingin menghapus pengguna ini? Ini tidak bisa dibatalkan.');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:text-red-800">Hapus</button>
-                                </form>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">Tidak ada data pengguna.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-        
-        <div class="p-6 bg-white rounded-b-xl">
-            {{ $users->links() }}
+                <!-- Detail -->
+                <div class="flex justify-between items-center">
+                    <span class="px-3 py-1 text-xs font-semibold rounded-full
+                        @if($user->role == 'admin') bg-red-500/30 text-red-200
+                        @elseif($user->role == 'kaprodi') bg-yellow-500/30 text-yellow-200
+                        @else bg-green-500/30 text-green-200 @endif">
+                        {{ ucfirst($user->role) }}
+                    </span>
+                    <span class="text-sm text-gray-200">
+                        {{ $user->profile->nim ?? $user->profile->nip ?? '-' }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Modal Aksi -->
+            <div id="modal-{{ $user->id }}" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+                <div class="bg-blue-950/90 text-white rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center relative border border-white/10 transform scale-95 opacity-0 transition-all duration-300 modal-content">
+                    <button onclick="closeModal('{{ $user->id }}')" class="absolute top-3 right-4 text-gray-400 hover:text-gray-200 text-lg">✕</button>
+                    <h3 class="text-lg font-semibold mb-2">{{ $user->name }}</h3>
+                    <p class="text-gray-300 text-sm mb-6">{{ $user->email }}</p>
+
+                    <div class="flex justify-center gap-4">
+                        <a href="{{ route('admin.users.edit', $user) }}"
+                           class="px-4 py-2 bg-blue-600/80 hover:bg-blue-700 text-white rounded-full transition-all duration-200">
+                           Ubah
+                        </a>
+                        <form action="{{ route('admin.users.destroy', $user) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus pengguna ini?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="px-4 py-2 bg-red-600/80 hover:bg-red-700 text-white rounded-full transition-all duration-200">
+                                Hapus
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        @empty
+            <div class="col-span-full text-center text-black-300 py-10">
+                Tidak ada data pengguna.
+            </div>
+        @endforelse
+    </div>
+
+    @if ($users->hasPages())
+    <div class="flex justify-end mt-10">
+        <div class="flex items-center space-x-2 bg-[#2a2a2a]/60 border border-gray-700 rounded-full px-4 py-2 shadow-lg backdrop-blur-sm">
+            {{-- Tombol Sebelumnya --}}
+            @if ($users->onFirstPage())
+                <span class="px-3 py-1 text-gray-500/70 rounded-full text-sm">‹</span>
+            @else
+                <a href="{{ $users->previousPageUrl() }}"
+                   class="px-3 py-1 bg-gray-600 text-white rounded-full text-sm hover:bg-gray-500 transition">‹</a>
+            @endif
+
+            {{-- Nomor Halaman --}}
+            @foreach ($users->getUrlRange(1, $users->lastPage()) as $page => $url)
+                @if ($page == $users->currentPage())
+                    <span class="px-3 py-1 bg-gray-400 text-black rounded-full text-sm font-semibold shadow-md">{{ $page }}</span>
+                @else
+                    <a href="{{ $url }}" class="px-3 py-1 bg-[#1e1e1e] text-gray-300 rounded-full text-sm border border-gray-600 hover:bg-gray-700 transition">{{ $page }}</a>
+                @endif
+            @endforeach
+
+            {{-- Tombol Berikutnya --}}
+            @if ($users->hasMorePages())
+                <a href="{{ $users->nextPageUrl() }}"
+                   class="px-3 py-1 bg-gray-600 text-white rounded-full text-sm hover:bg-gray-500 transition">›</a>
+            @else
+                <span class="px-3 py-1 text-gray-500/70 rounded-full text-sm">›</span>
+            @endif
         </div>
     </div>
-@endsection
+@endif
 
+
+<script>
+function openModal(id) {
+    const modal = document.getElementById(`modal-${id}`);
+    modal.classList.remove('hidden');
+    setTimeout(() => modal.querySelector('.modal-content').classList.remove('scale-95', 'opacity-0'), 10);
+}
+function closeModal(id) {
+    const modal = document.getElementById(`modal-${id}`);
+    const content = modal.querySelector('.modal-content');
+    content.classList.add('scale-95', 'opacity-0');
+    setTimeout(() => modal.classList.add('hidden'), 200);
+}
+</script>
+@endsection

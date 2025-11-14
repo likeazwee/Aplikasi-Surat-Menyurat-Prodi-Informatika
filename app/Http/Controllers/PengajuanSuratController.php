@@ -13,7 +13,7 @@ class PengajuanSuratController extends Controller
     {
         $jenisSurats = JenisSurat::orderBy('nama_surat', 'asc')->get();
 
-        // Syarat Dokumen (tidak berubah)
+        // Syarat Dokumen (masih rancu ditambahkan atau tidak)
         $syaratDokumen = [
             '3'  => ['Scan Kartu Tanda Mahasiswa (KTM)', 'Scan Kartu Rencana Studi (KRS) Terbaru'],
             '6'  => ['Scan KTM', 'Outline Skripsi/Proposal KP/Proposal PPL yang Disetujui'],
@@ -114,7 +114,6 @@ class PengajuanSuratController extends Controller
             'lampiran'       => 'nullable|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:2048',
         ]);
 
-        // VALIDASI DINAMIS (SEMUA npm DIGANTI nim)
         switch ($request->jenis_surat_id) {
             case '1': // Perubahan Nilai
                 $request->validate([
@@ -122,7 +121,6 @@ class PengajuanSuratController extends Controller
                     'extra_data.nama_matakuliah'    => 'required|string',
                     'extra_data.kode_matakuliah'    => 'required|string',
                     'extra_data.sks'                => 'required|numeric',
-                    // ... dst jika perlu validasi lengkap
                 ]);
                 break;
             case '2': // Input Nilai
