@@ -69,14 +69,32 @@
                 <h1 class="text-lg font-bold">Profil</h1>
             </div>
 
-            <nav class="mt-6 space-y-1">
-                <a href="{{ route('profile.edit') }}"
-                   class="flex items-center py-2 px-4 rounded hover:bg-blue-800 transition-all duration-200 {{ request()->routeIs('profile.edit') ? 'bg-blue-800' : '' }}">
-                    <svg class="h-6 w-6 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M5.121 17.804A10.97 10.97 0 0112 15c2.137 0 4.11.625 5.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    <span class="font-semibold">Atur Profil</span>
+            @php
+                use Illuminate\Support\Facades\Auth;
+
+                $user = Auth::user();
+                // Tentukan route dashboard sesuai peran user
+                if ($user) {
+                    switch ($user->role) {
+                        case 'admin':
+                            $dashboardRoute = route('admin.dashboard');
+                            break;
+                        case 'kaprodi':
+                            $dashboardRoute = route('kaprodi.dashboard');
+                            break;
+                        default:
+                            $dashboardRoute = route('dashboard');
+                            break;
+                    }
+                } else {
+                    $dashboardRoute = route('dashboard');
+                }
+            @endphp
+
+            <nav class="mt-6">
+                <a href="{{ $dashboardRoute }}"
+                   class="flex items-center py-2 px-4 rounded hover:bg-blue-800 {{ request()->is('dashboard') || request()->is('admin/dashboard') || request()->is('kaprodi/dashboard') ? 'bg-blue-800' : '' }}">
+                    <span class="ml-2 font-semibold">Dashboard</span>
                 </a>
             </nav>
 
@@ -96,13 +114,26 @@
             </div>
         </aside>
 
-        <!-- Konten Utama -->
-        <div class="flex-1 flex flex-col relative">
-            <main class="flex-1 p-6 main-background relative overflow-hidden">
-                <div class="absolute inset-0 opacity-60"></div>
-                <div class="relative z-10">
-                    @yield('content')
-                </div>
+        <!-- Main content -->
+        <div class="flex-1 flex flex-col">
+            <!-- Header -->
+            <header class="flex items-center justify-between bg-white px-6 py-4 shadow">
+                <h2 class="text-xl font-semibold text-gray-700">Atur Profil</h2>
+
+                <!-- Profile Button -->
+                <a href="{{ route('profile.edit') }}"
+                   class="flex items-center space-x-2 group px-3 py-2 rounded-lg transition transform hover:scale-105">
+                    <img class="h-9 w-9 rounded-full border border-gray-300 transition transform group-hover:scale-110"
+                         src="{{ asset('images/profile.logo.png') }}" alt="Profile">
+                    <span class="text-gray-800 font-medium group-hover:text-blue-700 transition">
+                        {{ Auth::user()->name ?? 'Admin' }}
+                    </span>
+                </a>
+            </header>
+
+            <!-- Page Content -->
+            <main class="flex-1 p-6">
+                @yield('content')
             </main>
         </div>
     </div>

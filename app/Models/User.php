@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -20,7 +19,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role', // Jangan lupa tambahkan 'role' ke fillable
+        'role', // pastikan role masuk ke fillable
     ];
 
     /**
@@ -34,29 +33,40 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that should be cast to native types.
      *
-     * @return array<string, string>
+     * @var array<string, string>
      */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
 
     /**
-     * 👇 TAMBAHKAN FUNGSI RELASI INI 👇
-     * Mendefinisikan relasi satu-ke-satu ke UserProfile.
+     * Relasi satu ke satu dengan UserProfile
      */
     public function profile()
     {
         return $this->hasOne(UserProfile::class);
     }
 
+    /**
+     * Relasi satu ke banyak dengan Komentar
+     */
     public function komentars()
     {
         return $this->hasMany(Komentar::class);
+    }
+
+    /**
+     * Helper untuk cek role user
+     * Bisa dipakai seperti $user->hasRole('admin') atau $user->hasRole('admin', 'kaprodi')
+     *
+     * @param  mixed ...$roles
+     * @return bool
+     */
+    public function hasRole(...$roles)
+    {
+        return in_array($this->role, $roles);
     }
 }

@@ -26,7 +26,7 @@ class DashboardController extends Controller
             });
         }
 
-        // ⚙ Filter status surat
+        // ⚙️ Filter status surat
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }

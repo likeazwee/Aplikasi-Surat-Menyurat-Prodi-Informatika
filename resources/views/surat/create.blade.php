@@ -9,42 +9,29 @@
 
 <body class="antialiased">
     <x-app-layout>
-        <x-slot name="header">
-            <div
-                class="flex justify-between items-center bg-gradient-to-r from-blue-900 to-blue-700 p-6 rounded-b-xl shadow-lg transition-all duration-300 hover:shadow-xl">
-                <div class="flex items-center pl-4 text-left w-full md:w-auto">
-                    <svg class="h-6 w-6 text-blue-100 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M3 12l2-2m0 0l7-7 7 7m-9 9v-6h4v6m1 0l-2 2m2-2l2-2" />
-                    </svg>
-                    <h2 class="font-semibold text-xl text-blue-100 leading-tight">{{ __('Ajukan Surat Baru') }}</h2>
-                </div>
-                <a href="{{ route('dashboard') }}" class="form-button text-white">Kembali ke Dashboard</a>
-            </div>
-        </x-slot>
 
         <div class="py-12" x-data="{ isLoaded: false }" x-init="setTimeout(() => { isLoaded = true; }, 300)">
             <div x-show="isLoaded" x-transition:enter="transition ease-out duration-1000"
                 x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100">
                 <div class="max-w-6xl mx-auto sm:px-6 lg:px-8 space-y-8">
                     <div
-                        class="bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-500 hover:shadow-xl">
-                        <div class="p-6 bg-blue-50">
-                            <h3 class="text-lg font-medium text-blue-700 flex items-center gap-2">
-                                <svg class="h-6 w-6 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                </svg>
-                                Form Ajukan Surat Baru
-                            </h3>
-                        </div>
+    class="bg-blue-900 rounded-xl shadow-lg overflow-hidden transition-all duration-500 hover:shadow-xl">
+    <div class="p-6 bg-blue-800">
+        <h3 class="text-lg font-medium text-white flex items-center gap-2">
+            <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            Form Ajukan Surat Baru
+        </h3>
+    </div>
+
                         <form method="POST" action="{{ route('surat.store') }}" enctype="multipart/form-data"
                             class="p-6 space-y-6" novalidate>
                             @csrf
                             <div>
-                                <x-input-label for="jenis_surat_id" value="{{ __('Pilih Jenis Surat') }}" />
+                                <x-input-label for="jenis_surat_id" value="{{ __('Pilih Jenis Surat') }}" class="text-white" />
                                 <select id="jenis_surat_id" name="jenis_surat_id"
                                     class="block mt-1 w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm transition-all duration-300 hover:border-blue-600">
                                     <option value="" disabled selected>-- Pilih salah satu --</option>
@@ -57,7 +44,7 @@
                                 <x-input-error :messages="$errors->get('jenis_surat_id')" class="mt-2" />
                             </div>
                             <div>
-                                <x-input-label for="keterangan" value="{{ __('Keterangan (Opsional)') }}" />
+                                <x-input-label for="keterangan" value="{{ __('Keterangan (Opsional)') }}" class="text-white" />
                                 <textarea id="keterangan" name="keterangan" rows="4"
                                     class="block mt-1 w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm"
                                     placeholder="Tambahkan keterangan...">{{ old('keterangan') }}</textarea>
@@ -305,9 +292,9 @@
                             </div>
 
                             <div>
-                                <x-input-label for="lampiran" value="{{ __('Upload Lampiran (Opsional)') }}" />
+                                <x-input-label for="lampiran" value="{{ __('Upload Lampiran (Opsional)') }}" class="text-white" />
                                 <input id="lampiran" name="lampiran" type="file"
-                                    class="block mt-1 w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-500 file:text-white hover:file:bg-blue-600">
+    class="block mt-1 w-full text-white file:text-white file:bg-blue-500 file:hover:bg-blue-600" />
                                 <x-input-error :messages="$errors->get('lampiran')" class="mt-2" />
                             </div>
                             <div class="flex items-center justify-end mt-8">
