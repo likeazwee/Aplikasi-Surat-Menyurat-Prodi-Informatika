@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\PengajuanSurat;
+use App\Models\JenisSurat; // ✅ Import Model JenisSurat (PENTING)
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -17,43 +18,76 @@ class DashboardController extends Controller
      */
     public function index(Request $request)
     {
-        // Ambil semua input filter dari request
+        // 1. Ambil Input Filter
         $searchNama = $request->input('search_nama');
-        $searchJenis = $request->input('search_jenis');
-        $status = $request->input('status'); // ✅ Tambahan untuk filter status
+        $status = $request->input('status'); // Filter status dari dropdown
 
-        // Query untuk statistik status (tidak diubah)
+        // 2. Query Statistik (Total, Pending, Disetujui, Ditolak)
         $statusCounts = PengajuanSurat::select(
                 DB::raw('count(*) as total'),
                 DB::raw("sum(case when status = 'pending' then 1 else 0 end) as pending"),
                 DB::raw("sum(case when status = 'disetujui' then 1 else 0 end) as disetujui"),
                 DB::raw("sum(case when status = 'ditolak' then 1 else 0 end) as ditolak")
-            )
-            ->first();
+            )->first();
 
-        // Query utama untuk menampilkan data surat
-        $pengajuanSurats = PengajuanSurat::with(['user.profile', 'jenisSurat'])
+        // 3. Query KHUSUS PENDING (Tidak boleh terpengaruh filter apapun)
+        // Ini agar bagian atas "Menunggu Persetujuan" selalu muncul
+        $suratPending = PengajuanSurat::with(['user.profile', 'jenisSurat'])
+            ->where('status', 'pending')
+            ->latest()
+            ->get();
+
+        // 4. Query RIWAYAT SURAT (Bisa difilter)
+        // Ini untuk bagian bawah dashboard "Riwayat Surat"
+        $riwayatSurat = PengajuanSurat::with(['user.profile', 'jenisSurat'])
+            ->where('status', '!=', 'pending') // Hanya ambil yg BUKAN pending (Disetujui/Ditolak)
             ->when($searchNama, function ($query, $searchNama) {
                 return $query->whereHas('user', function ($q) use ($searchNama) {
                     $q->where('name', 'like', "%{$searchNama}%");
                 });
             })
-            ->when($searchJenis, function ($query, $searchJenis) {
-                return $query->whereHas('jenisSurat', function ($q) use ($searchJenis) {
-                    $q->where('nama_surat', 'like', "%{$searchJenis}%");
-                });
-            })
             ->when($status, function ($query, $status) {
-                // ✅ Tambahan: filter status
+                // Jika user memilih filter status tertentu (misal: Disetujui/Ditolak)
                 return $query->where('status', $status);
             })
             ->latest()
-            ->paginate(12);
+            ->paginate(9); // Pagination khusus riwayat
 
-        // ✅ Pastikan pagination tetap bawa parameter filter
-        $pengajuanSurats->appends($request->all());
+        $riwayatSurat->appends($request->all());
 
-        return view('admin.dashboard', compact('pengajuanSurats', 'statusCounts'));
+        // 5. LOGIKA UNTUK CHART STATISTIK
+        $semuaJenisSurat = JenisSurat::all();
+        $bulanLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        $chartDatasets = [];
+        $colors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#6366f1'];
+        
+        foreach ($semuaJenisSurat as $index => $jenis) {
+            $dataPerBulan = [];
+            for ($m = 1; $m <= 12; $m++) {
+                $count = PengajuanSurat::where('jenis_surat_id', $jenis->id)
+                    ->whereYear('created_at', date('Y'))
+                    ->whereMonth('created_at', $m)
+                    ->count();
+                $dataPerBulan[] = $count;
+            }
+            $chartDatasets[] = [
+                'label' => $jenis->nama_surat,
+                'data' => $dataPerBulan,
+                'borderColor' => $colors[$index % count($colors)],
+                'backgroundColor' => $colors[$index % count($colors)],
+                'fill' => false,
+                'tension' => 0.3
+            ];
+        }
+
+        // Kirim data ke View
+        return view('admin.dashboard', compact(
+            'suratPending', 
+            'riwayatSurat', 
+            'statusCounts', 
+            'chartDatasets', 
+            'bulanLabels'
+        ));
     }
 
     /**
