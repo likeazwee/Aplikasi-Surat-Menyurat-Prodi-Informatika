@@ -9,26 +9,22 @@ class Komentar extends Model
 {
     use HasFactory;
 
-    // Menyesuaikan dengan nama tabel singular kita
+    // 🔥 PENTING: Karena nama tabel di database Anda 'komentar' (bukan komentars)
     protected $table = 'komentar';
 
     protected $fillable = [
-        'pengajuan_surat_id',
-        'user_id',
-        'body',
+        'pengajuan_surat_id', 
+        'user_id', 
+        'body' // Sesuaikan dengan kolom di screenshot Anda ($table->text('body'))
     ];
 
-    /**
-     * Mendefinisikan relasi: Satu komentar dimiliki oleh satu User.
-     */
+    // Relasi ke User (Siapa yang nulis komentar)
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Mendefinisikan relasi: Satu komentar dimiliki oleh satu PengajuanSurat.
-     */
+    // Relasi ke Surat
     public function pengajuanSurat()
     {
         return $this->belongsTo(PengajuanSurat::class);
