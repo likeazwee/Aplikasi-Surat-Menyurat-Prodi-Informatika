@@ -8,32 +8,35 @@ use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    /**
-     * Menampilkan dashboard untuk Kaprodi.
-     */
     public function index(Request $request)
     {
-        // Memulai query builder dengan relasi yang dibutuhkan
         $query = PengajuanSurat::with('user', 'jenisSurat');
 
-        // Filter berdasarkan nama mahasiswa jika ada input
+        // 🔍 Filter nama mahasiswa
         if ($request->filled('search_nama')) {
             $query->whereHas('user', function ($q) use ($request) {
                 $q->where('name', 'like', '%' . $request->search_nama . '%');
             });
         }
 
-        // Filter berdasarkan jenis surat jika ada input
+        // 📨 Filter jenis surat
         if ($request->filled('search_jenis')) {
             $query->whereHas('jenisSurat', function ($q) use ($request) {
                 $q->where('nama_surat', 'like', '%' . $request->search_jenis . '%');
             });
         }
 
-        // Mengambil hasil query, diurutkan berdasarkan yang terbaru
-        $pengajuanSurats = $query->latest()->get();
+        // ⚙️ Filter status surat
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
 
-        // Mengirim data surat dan juga input pencarian (jika ada) ke view
+        // Pagination 12 data per halaman
+        $pengajuanSurats = $query->latest()->paginate(12);
+
+        // ✅ Tambahkan appends agar pagination tetap bawa filter
+        $pengajuanSurats->appends($request->all());
+
         return view('kaprodi.dashboard', [
             'pengajuanSurats' => $pengajuanSurats,
         ]);

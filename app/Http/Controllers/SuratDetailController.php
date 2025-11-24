@@ -4,62 +4,56 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\PengajuanSurat;
-use App\Models\Komentar;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class SuratDetailController extends Controller
 {
-    /**
-     * Menampilkan halaman detail untuk satu pengajuan surat.
-     */
     public function show(PengajuanSurat $surat)
     {
         $user = Auth::user();
 
-        // 1. Tentukan layout berdasarkan role
-        $layout = 'layouts.app'; // Default layout (mahasiswa)
-        if ($user->role == 'admin') {
-            $layout = 'layouts.admin';
-        } elseif ($user->role == 'kaprodi') {
-            $layout = 'layouts.admin'; // Asumsi kaprodi pakai layout admin
+        // --- TAMBAHAN BARU: TANDAI SUDAH DIBACA ---
+        // Jika yang membuka adalah Admin/Kaprodi DAN surat masih status unread (0)
+        // Maka ubah jadi read (1)
+        if (in_array($user->role, ['admin', 'kaprodi']) && !$surat->is_read) {
+            $surat->update(['is_read' => true]);
         }
+        // ------------------------------------------
 
-        // 2. Otorisasi: Memastikan hanya user yang bersangkutan atau admin/kaprodi yang bisa melihat
+        // ... (Sisa kode lama Anda tetap sama di bawah ini) ...
+        
+        $layout = in_array($user->role, ['admin', 'kaprodi']) ? 'layouts.admin' : 'layouts.app';
+
         if ($user->role == 'mahasiswa' && $surat->user_id != $user->id) {
-            abort(403, 'ANDA TIDAK MEMILIKI AKSES.');
+            abort(403, 'AKSES DITOLAK.');
         }
 
-        // 3. Ambil surat beserta relasi yang dibutuhkan
         $surat->load(['user.profile', 'jenisSurat', 'komentars.user']);
 
-        // 4. Kirim data dan nama layout ke view
         return view('surat.show', compact('surat', 'layout'));
     }
 
-    /**
-     * Menyimpan komentar baru dari mahasiswa atau admin.
-     */
     public function storeKomentar(Request $request, PengajuanSurat $surat)
     {
-        // Validasi
         $request->validate([
-            'body' => 'required|string',
+            'body' => 'required|string|max:1000',
         ]);
 
-        // Memastikan hanya user yang bersangkutan atau admin/kaprodi yang bisa berkomentar
         $user = Auth::user();
+
+        // Validasi keamanan lagi (biar mahasiswa iseng gak bisa nembak API komentar ke surat orang lain)
         if ($user->role == 'mahasiswa' && $surat->user_id != $user->id) {
-            abort(403, 'ANDA TIDAK MEMILIKI AKSES.');
+            abort(403, 'Tidak bisa mengomentari surat ini.');
         }
 
-        // Buat komentar baru
+        // Simpan Komentar
+        // Pastikan Model Komentar sudah dibuat seperti langkah no 1
         $surat->komentars()->create([
             'user_id' => $user->id,
             'body' => $request->body,
         ]);
 
-        return redirect()->route('surat.show', $surat)->with('success', 'Komentar berhasil dikirim.');
+        return back()->with('success', 'Komentar terkirim.');
     }
 }
-

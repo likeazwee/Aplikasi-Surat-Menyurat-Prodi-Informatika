@@ -20,7 +20,8 @@ class PengajuanSurat extends Model
         'file_path',
         'approver_id',
         'tanggal_diproses',
-        'extra_data', // <-- INI YANG DITAMBAHKAN
+        'extra_data',
+        'is_read', // ✅ WAJIB DITAMBAHKAN DI SINI
     ];
 
     /**
@@ -28,10 +29,11 @@ class PengajuanSurat extends Model
      *
      * @var array
      */
-    // 👇 INI BLOK PENTING UNTUK JSON 👇
+    // 👇 INI BLOK PENTING UNTUK JSON & TIPE DATA 👇
     protected $casts = [
         'extra_data' => 'array',
         'tanggal_diproses' => 'datetime',
+        'is_read' => 'boolean', // ✅ Tambahkan ini biar lebih sip (0/1 jadi false/true)
     ];
 
     public function user(): BelongsTo
@@ -46,7 +48,6 @@ class PengajuanSurat extends Model
 
     public function komentars()
     {
-        // Pastikan nama model Komentar sudah benar
-        return $this->hasMany(Komentar::class, 'pengajuan_surat_id'); 
+        return $this->hasMany(Komentar::class);
     }
 }

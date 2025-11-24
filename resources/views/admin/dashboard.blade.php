@@ -1,219 +1,217 @@
 @extends('layouts.admin')
 
-@section('header', 'Dashboard Admin')
-
 @section('content')
-<div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
-            
-    {{-- Pesan Sukses/Error dengan style baru --}}
-    @if (session('success'))
-        <div x-data="{ showSuccess: true }" x-show="showSuccess" 
-             x-transition:enter="transition ease-out duration-500" 
-             x-transition:enter-start="opacity-0 -translate-y-5" 
-             x-transition:enter-end="opacity-100 translate-y-0"
-             class="bg-blue-100 border-l-4 border-blue-500 p-4 rounded-xl shadow-md relative transition-all duration-300 hover:shadow-lg">
-            <div class="flex items-center">
-                <svg class="h-6 w-6 text-blue-600 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <strong class="font-bold text-blue-800">Sukses!</strong>
-                <span class="ml-2 text-blue-700">{{ session('success') }}</span>
-            </div>
-            <button @click="showSuccess = false" class="absolute top-2 right-3 text-blue-500 hover:text-blue-700 transition-colors duration-200">✕</button>
-        </div>
-    @endif
-     @if (session('error'))
-        <div x-data="{ showError: true }" x-show="showError" 
-             x-transition:enter="transition ease-out duration-500" 
-             x-transition:enter-start="opacity-0 -translate-y-5" 
-             x-transition:enter-end="opacity-100 translate-y-0"
-             class="bg-red-100 border-l-4 border-red-500 p-4 rounded-xl shadow-md relative transition-all duration-300 hover:shadow-lg">
-            <div class="flex items-center">
-                <svg class="h-6 w-6 text-red-600 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-                <strong class="font-bold text-red-800">Error!</strong>
-                <span class="ml-2 text-red-700">{{ session('error') }}</span>
-            </div>
-            <button @click="showError = false" class="absolute top-2 right-3 text-red-500 hover:text-red-700 transition-colors duration-200">✕</button>
-        </div>
-    @endif
+<div class="max-w-7xl mx-auto space-y-10">
 
-    <!-- Card Statistik (Menampilkan data semua surat) -->
-    <div class="flex flex-wrap justify-between items-center gap-4">
-         <div class="p-4 bg-gradient-to-br from-blue-800 to-blue-600 text-white rounded-xl shadow-lg transform hover:scale-105 transition-all duration-500 hover:shadow-xl flex-1 min-w-[200px]">
-            <h3 class="text-md font-semibold flex items-center gap-2">Total Surat Masuk</h3>
-            <p class="text-2xl font-bold mt-1">{{ $statusCounts->total ?? 0 }}</p>
+    {{-- 1. Statistik Ringkas --}}
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col">
+            <span class="text-gray-500 text-xs font-bold uppercase tracking-wider">Total</span>
+            <span class="text-3xl font-bold text-blue-600">{{ $statusCounts->total }}</span>
         </div>
-        <div class="p-4 bg-gradient-to-br from-blue-700 to-blue-500 text-white rounded-xl shadow-lg transform hover:scale-105 transition-all duration-500 hover:shadow-xl flex-1 min-w-[200px]">
-            <h3 class="text-md font-semibold flex items-center gap-2">Disetujui</h3>
-            <p class="text-2xl font-bold mt-1">{{ $statusCounts->disetujui ?? 0 }}</p>
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col">
+            <span class="text-gray-500 text-xs font-bold uppercase tracking-wider">Pending</span>
+            <span class="text-3xl font-bold text-yellow-500">{{ $statusCounts->pending }}</span>
         </div>
-        <div class="p-4 bg-gradient-to-br from-blue-600 to-blue-400 text-white rounded-xl shadow-lg transform hover:scale-105 transition-all duration-500 hover:shadow-xl flex-1 min-w-[200px]">
-            <h3 class="text-md font-semibold flex items-center gap-2">Ditolak</h3>
-            <p class="text-2xl font-bold mt-1">{{ $statusCounts->ditolak ?? 0 }}</p>
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col">
+            <span class="text-gray-500 text-xs font-bold uppercase tracking-wider">Disetujui</span>
+            <span class="text-3xl font-bold text-green-500">{{ $statusCounts->disetujui }}</span>
         </div>
-        <div class="p-4 bg-gradient-to-br from-blue-500 to-blue-300 text-white rounded-xl shadow-lg transform hover:scale-105 transition-all duration-500 hover:shadow-xl flex-1 min-w-[200px]">
-            <h3 class="text-md font-semibold flex items-center gap-2">Menunggu</h3>
-            <p class="text-2xl font-bold mt-1">{{ $statusCounts->pending ?? 0 }}</p>
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col">
+            <span class="text-gray-500 text-xs font-bold uppercase tracking-wider">Ditolak</span>
+            <span class="text-3xl font-bold text-red-500">{{ $statusCounts->ditolak }}</span>
         </div>
     </div>
 
-    <!-- Tabel Riwayat -->
-    <div class="bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-500 hover:shadow-xl">
-        <div class="p-6 bg-blue-50">
-            <h3 class="text-lg font-medium text-blue-700 flex items-center gap-2">
-                <svg class="h-6 w-6 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
-                Daftar Pengajuan Surat Masuk
-            </h3>
+    {{-- 2. BAGIAN: MENUNGGU PERSETUJUAN (PENDING) --}}
+    <div>
+        <div class="flex items-center gap-2 mb-4">
+            <div class="w-1 h-6 bg-yellow-500 rounded-full"></div>
+            <h2 class="text-xl font-bold text-gray-800">Menunggu Persetujuan</h2>
+            <span class="bg-yellow-100 text-yellow-800 text-xs font-bold px-2 py-1 rounded-full">
+                {{ $suratPending->count() }}
+            </span>
         </div>
 
-        <!-- Form Pencarian dengan style baru -->
-        <form method="GET" action="{{ route('admin.dashboard') }}" class="p-6 border-b border-blue-100">
-            <div class="flex flex-wrap items-end gap-4">
-                <div class="flex-1 min-w-[200px]">
-                    <label for="search_nama" class="block text-sm font-medium text-gray-700">Cari Nama Mahasiswa</label>
-                    <input id="search_nama" name="search_nama" type="text" placeholder="Nama Mahasiswa..." class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500" value="{{ request('search_nama') }}">
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            @forelse ($suratPending as $surat)
+                @php
+                    // 🔥 LOGIKA WARNA KARTU 🔥
+                    // Jika belum dibaca: Merah Muda. Jika sudah: Putih.
+                    $isUnread = !$surat->is_read; 
+                    
+                    $cardClass = $isUnread 
+                        ? 'bg-red-50 border-red-500 shadow-md' // Style Belum Dibaca
+                        : 'bg-white border-yellow-400 shadow-sm'; // Style Sudah Dibaca (Normal)
+                    
+                    $badgeClass = $isUnread 
+                        ? 'bg-red-100 text-red-700 animate-pulse' 
+                        : 'bg-yellow-100 text-yellow-700';
+                    
+                    $statusText = $isUnread ? 'BARU MASUK' : 'PENDING';
+                @endphp
+
+                <div class="relative {{ $cardClass }} border-l-4 rounded-xl hover:shadow-lg transition border-y border-r border-gray-200 overflow-hidden group">
+                    
+                    {{-- 🔴 Indikator Titik Merah (Ping Animation) untuk Surat Baru --}}
+                    @if($isUnread)
+                        <span class="absolute top-3 right-3 flex h-3 w-3 z-20 pointer-events-none">
+                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                          <span class="relative inline-flex rounded-full h-3 w-3 bg-red-600"></span>
+                        </span>
+                    @endif
+
+                    {{-- Link ke Detail --}}
+                    <a href="{{ route('surat.show', $surat->id) }}" class="block p-5 hover:opacity-90 transition cursor-pointer">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="font-bold text-gray-800 text-lg group-hover:text-blue-600 transition">{{ $surat->jenisSurat->nama_surat }}</h3>
+                            <span class="{{ $badgeClass }} text-[10px] font-bold px-2 py-1 rounded uppercase">
+                                {{ $statusText }}
+                            </span>
+                        </div>
+                        <div class="space-y-2 text-sm text-gray-600 mb-4">
+                            <div class="flex items-center gap-2">
+                                <span class="font-semibold text-gray-800">{{ $surat->user->name }}</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-xs text-gray-400">
+                                <span>{{ $surat->created_at->format('d M Y') }}</span>
+                            </div>
+                            <div class="mt-2 text-xs text-blue-500 font-medium flex items-center gap-1">
+                                👁️ Klik untuk cek surat
+                            </div>
+                        </div>
+                    </a>
+
+                    {{-- Tombol Aksi Cepat --}}
+                    <div class="px-5 pb-5 grid grid-cols-2 gap-3 relative z-10">
+                        <form action="{{ route('admin.surat.approve', $surat->id) }}" method="POST">
+                            @csrf @method('PATCH')
+                            <button class="w-full bg-green-50 text-green-700 hover:bg-green-100 border border-green-200 font-semibold py-2 rounded-lg text-xs transition">
+                                ✓ Setujui
+                            </button>
+                        </form>
+                        <form action="{{ route('admin.surat.reject', $surat->id) }}" method="POST">
+                            @csrf @method('PATCH')
+                            <button class="w-full bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 font-semibold py-2 rounded-lg text-xs transition">
+                                ✕ Tolak
+                            </button>
+                        </form>
+                    </div>
                 </div>
-                <div class="flex-1 min-w-[200px]">
-                   <label for="search_jenis" class="block text-sm font-medium text-gray-700">Cari Jenis Surat</label>
-                    <input id="search_jenis" name="search_jenis" type="text" placeholder="Jenis Surat..." class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500" value="{{ request('search_jenis') }}">
+            @empty
+                <div class="col-span-full bg-green-50 border border-green-100 p-6 rounded-xl text-center">
+                    <p class="text-green-800 font-medium text-sm">🎉 Tidak ada pengajuan pending. Semua aman!</p>
                 </div>
-                <button type="submit" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-700 to-blue-500 text-white font-semibold text-xs rounded-full shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300 h-10">
+            @endforelse
+        </div>
+    </div>
+
+    {{-- 3. BAGIAN: RIWAYAT SURAT (DISETUJUI & DITOLAK) --}}
+    <div>
+        <div class="flex items-center gap-2 mb-4">
+            <div class="w-1 h-6 bg-blue-600 rounded-full"></div>
+            <h2 class="text-xl font-bold text-gray-800">Riwayat Surat</h2>
+        </div>
+
+        {{-- Filter Form --}}
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-6">
+            <form id="filterForm" method="GET" action="{{ route('admin.dashboard') }}" class="flex flex-col sm:flex-row gap-4">
+                <input type="text" name="search_nama" value="{{ request('search_nama') }}" placeholder="Cari nama mahasiswa..." 
+                       class="flex-1 rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500">
+                
+                <select name="status" onchange="document.getElementById('filterForm').submit()" 
+                        class="rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500 cursor-pointer">
+                    <option value="">Semua Riwayat</option>
+                    <option value="disetujui" {{ request('status') == 'disetujui' ? 'selected' : '' }}>Disetujui</option>
+                    <option value="ditolak" {{ request('status') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
+                </select>
+                
+                <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition">
                     Cari
                 </button>
-            </div>
-        </form>
-
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-blue-100">
-                <thead class="bg-blue-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-blue-600 uppercase">Mahasiswa</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-blue-600 uppercase">Jenis Surat</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-blue-600 uppercase">Tanggal</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-blue-600 uppercase">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-blue-600 uppercase">Lampiran</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-blue-600 uppercase">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-blue-50">
-                    @forelse ($pengajuanSurats as $surat)
-                        <tr class="hover:bg-blue-50/50 transition-all duration-300 animate-fade-in-row" style="animation-delay: {{ $loop->iteration * 100 }}ms">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ $surat->user->name ?? 'Pengguna Dihapus' }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                {{-- Link ke Halaman Detail --}}
-                                <a href="{{ route('surat.show', ['surat' => $surat]) }}" class="text-blue-700 hover:text-blue-900 transition-colors duration-200">
-                                    {{ $surat->jenisSurat->nama_surat ?? 'Jenis Dihapus' }}
-                                </a>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $surat->created_at->format('d F Y') }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                @if($surat->status == 'pending')
-                                    <span class="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800 animate-pulse">Menunggu</span>
-                                @elseif($surat->status == 'disetujui')
-                                    <span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-700">Disetujui</span>
-                                @else
-                                    <span class="px-3 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-600">Ditolak</span>
-                                @endif
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                @if($surat->file_path)
-                                    <a href="{{ Storage::url($surat->file_path) }}" target="_blank" class="lampiran-button flex items-center max-w-max">
-                                        <svg class="h-4 w-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.102 1.101" />
-                                        </svg>
-                                        Lihat File
-                                    </a>
-                                @else
-                                    -
-                                @endif
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                @if ($surat->status == 'pending')
-                                    <div class="flex items-center space-x-3">
-                                        <form action="{{ route('admin.surat.approve', ['surat' => $surat]) }}" method="POST" class="form-approve">
-                                            @csrf
-                                            @method('PATCH')
-                                            <button type="submit" class="action-button-green">Setujui</button>
-                                        </form>
-                                        <form action="{{ route('admin.surat.reject', ['surat' => $surat]) }}" method="POST" class="form-reject">
-                                            @csrf
-                                            @method('PATCH')
-                                            <button type="submit" class="action-button-red">Tolak</button>
-                                        </form>
-                                    </div>
-                                @elseif ($surat->status == 'disetujui')
-                                    {{-- Tombol Download --}}
-                                     <a href="{{ route('admin.surat.download', ['surat' => $surat]) }}" class="download-button">
-                                        Download
-                                    </a>
-                                @else
-                                    -
-                                @endif
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6" class="text-center py-4 text-gray-500">Tidak ada data pengajuan surat.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-        
-        {{-- Paginasi --}}
-        <div class="p-6 bg-white rounded-b-xl">
-            {{ $pengajuanSurats->withQueryString()->links() }}
+            </form>
         </div>
 
+        {{-- Grid Riwayat --}}
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            @forelse ($riwayatSurat as $surat)
+                <div class="bg-[#1e3a8a] rounded-xl shadow-sm border border-blue-900 hover:shadow-md transition overflow-hidden flex flex-col h-full group relative">
+                    
+                    <a href="{{ route('surat.show', $surat->id) }}" class="block p-5 flex-1 text-white hover:bg-blue-800 transition cursor-pointer">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-bold text-white text-lg group-hover:text-blue-200 transition">{{ $surat->jenisSurat->nama_surat }}</h3>
+                            @if($surat->status == 'disetujui')
+                                <span class="bg-green-400 text-green-900 text-[10px] font-bold px-2 py-1 rounded uppercase">Selesai</span>
+                            @else
+                                <span class="bg-red-400 text-red-900 text-[10px] font-bold px-2 py-1 rounded uppercase">Ditolak</span>
+                            @endif
+                        </div>
+                        <p class="text-sm text-blue-100 mb-4">Diajukan oleh <span class="font-semibold text-white">{{ $surat->user->name }}</span></p>
+                        
+                        <div class="text-xs text-blue-200 space-y-1 opacity-80">
+                            <p>Diajukan: {{ $surat->created_at->format('d M Y') }}</p>
+                            <p>Diproses: {{ $surat->updated_at->format('d M Y') }}</p>
+                            <p class="mt-2 text-yellow-300 font-semibold underline decoration-dashed">👉 Klik untuk lihat detail</p>
+                        </div>
+                    </a>
+                    
+                    @if($surat->status == 'disetujui')
+                        <div class="bg-blue-900/50 p-3 border-t border-blue-800 relative z-10">
+                            <a href="{{ route('admin.surat.download', $surat->id) }}" class="flex items-center justify-center gap-2 w-full text-white text-sm font-semibold hover:text-blue-200 transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                Download Surat
+                            </a>
+                        </div>
+                    @else
+                         <div class="bg-red-900/20 p-3 border-t border-red-900/30 text-center relative z-10">
+                            <span class="text-red-200 text-xs font-medium">Surat telah ditolak</span>
+                        </div>
+                    @endif
+                </div>
+            @empty
+                <div class="col-span-full text-center py-10 text-gray-400 italic bg-white rounded-xl border border-gray-100">
+                    Tidak ada riwayat surat yang cocok dengan filter.
+                </div>
+            @endforelse
+        </div>
     </div>
-</div>
-</div>
 
-{{-- SweetAlert2 --}}
-@push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Logika SweetAlert
-    document.querySelectorAll('.form-approve').forEach(form => {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            Swal.fire({
-                title: 'Setujui Surat?',
-                text: 'Apakah Anda yakin ingin menyetujui surat ini?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#16a34a',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Ya, Setujui',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) form.submit();
-            });
-        });
-    });
+    {{-- 4. Pagination --}}
+    @if ($riwayatSurat->hasPages())
+        <div class="flex justify-end">
+            {{ $riwayatSurat->links() }}
+        </div>
+    @endif
 
-    document.querySelectorAll('.form-reject').forEach(form => {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            Swal.fire({
-                title: 'Tolak Surat?',
-                text: 'Apakah Anda yakin ingin menolak surat ini?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Ya, Tolak',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) form.submit();
-            });
-        });
-    });
-});
-</script>
-@endpush
+    {{-- 5. Chart Grafik --}}
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <h3 class="text-lg font-bold text-gray-800 mb-4">Statistik Bulanan</h3>
+        <div class="relative h-72 w-full">
+            <canvas id="suratChart"></canvas>
+        </div>
+    </div>
+
+</div>
 @endsection
 
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const ctx = document.getElementById('suratChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: { 
+                labels: @json($bulanLabels ?? []), 
+                datasets: @json($chartDatasets ?? []) 
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom' } },
+                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+            }
+        });
+    });
+</script>
+@endpush

@@ -13,16 +13,19 @@ class PengajuanSuratController extends Controller
     {
         $jenisSurats = JenisSurat::orderBy('nama_surat', 'asc')->get();
 
-        // Syarat Dokumen (masih rancu ditambahkan atau tidak)
         $syaratDokumen = [
             '3'  => ['Scan Kartu Tanda Mahasiswa (KTM)', 'Scan Kartu Rencana Studi (KRS) Terbaru'],
+            '5'  => ['Surat Permohonan Pribadi ke Koordinator Prodi', 'Foto Copy KTM', 'Foto Copy KRS Terakhir', 'Fotocopy LHS Terakhir', 'Bukti Pembayaran UKT Terakhir'],
             '6'  => ['Scan KTM', 'Outline Skripsi/Proposal KP/Proposal PPL yang Disetujui'],
             '7'  => ['Scan KTM', 'Proposal Magang (jika ada)'],
+            '9'  => ['Pengajuan Pribadi yang Ditandatangani dan Materai Asli', 'KTM Asli', 'Transkrip Nilai Asli', 'KHS Asli', 'KRS Asli', 'Surat Bebas Perpusatakaan UNIB', 'Surat Bebas Perpustakaan Fakultas'],
+            '12' => ['Pengajuan Pribadi yang Ditandatangani dan Materai Asli', 'KTM Asli', 'Transkrip Nilai Asli', 'KHS Asli', 'KRS Asli', 'Surat Bebas Perpusatakaan UNIB', 'Surat Bebas Perpustakaan Fakultas'],
+            '14' => ['Surat Pernyataan Hanya Mengambil Maksimal 6 SKS di ttd Oleh Mahasiswa dan Ketua Prodi', 'Transkrip Nilai Sementara'],
             '15' => ['Bukti pembayaran UKT semester sebelumnya'],
             '16' => ['Scan KTM', 'Transkrip Nilai Sementara', 'Bukti Lulus Ujian Komprehensif'],
         ];
 
-        // Dokumentasi Dynamic Fields (SEMUA npm DIGANTI nim)
+        // Dokumentasi Dynamic Fields
         $dynamicFields = [
             '1' => [ // Perubahan Nilai
                 ['name' => 'nim', 'label' => 'NPM / NIM', 'type' => 'text'],
@@ -43,8 +46,8 @@ class PengajuanSuratController extends Controller
             '4' => [ // Peminjaman Ruangan
                 ['name' => 'nama_kegiatan', 'label' => 'Nama Kegiatan', 'type' => 'text'],
                 ['name' => 'tanggal_peminjaman', 'label' => 'Tanggal Peminjaman', 'type' => 'date'],
-                ['name' => 'waktu_mulai', 'label' => 'Waktu Mulai', 'type' => 'text'],
-                ['name' => 'waktu_selesai', 'label' => 'Waktu Selesai', 'type' => 'text'],
+                ['name' => 'waktu_mulai', 'label' => 'Waktu Mulai', 'type' => 'text'],   // Bisa diganti type='time'
+                ['name' => 'waktu_selesai', 'label' => 'Waktu Selesai', 'type' => 'text'], // Bisa diganti type='time'
             ],
             '5' => [ // Pengajuan Cuti
                 ['name' => 'nim', 'label' => 'NPM / NIM', 'type' => 'text'],
@@ -52,6 +55,8 @@ class PengajuanSuratController extends Controller
             ],
             '6' => [ // Pengambilan Data
                 ['name' => 'nim', 'label' => 'NPM / NIM', 'type' => 'text'],
+                // 🔥 PERBAIKAN: Field ini sebelumnya hilang, padahal di validasi diminta
+                ['name' => 'tujuan_surat', 'label' => 'Tujuan Pengambilan Data', 'type' => 'text'], 
             ],
             '7' => [ // Pengantar Magang
                 ['name' => 'nim', 'label' => 'NPM / NIM', 'type' => 'text'],
@@ -86,7 +91,7 @@ class PengajuanSuratController extends Controller
                 ['name' => 'nama_matakuliah', 'label' => 'Nama Mata Kuliah', 'type' => 'text'],
                 ['name' => 'kode_matakuliah', 'label' => 'Kode Mata Kuliah', 'type' => 'text'],
                 ['name' => 'sks', 'label' => 'SKS', 'type' => 'number'],
-                ['name' => 'dosen_remedial', 'label' => 'Dosen Remedial', 'type' => 'text'], // TAMBAHAN BARU
+                ['name' => 'dosen_remedial', 'label' => 'Dosen Remedial', 'type' => 'text'],
             ],
             '14' => [ // Usulan UKT
                 ['name' => 'nim', 'label' => 'NPM / NIM', 'type' => 'text'],
@@ -117,10 +122,14 @@ class PengajuanSuratController extends Controller
         switch ($request->jenis_surat_id) {
             case '1': // Perubahan Nilai
                 $request->validate([
-                    'extra_data.nim'                => 'required|string',
-                    'extra_data.nama_matakuliah'    => 'required|string',
-                    'extra_data.kode_matakuliah'    => 'required|string',
-                    'extra_data.sks'                => 'required|numeric',
+                    'extra_data.nim'                   => 'required|string',
+                    'extra_data.nama_matakuliah'       => 'required|string',
+                    'extra_data.kode_matakuliah'       => 'required|string',
+                    'extra_data.sks'                   => 'required|numeric',
+                    // 🔥 PERBAIKAN: Menambahkan validasi yang kurang
+                    'extra_data.nama_dosen_matakuliah' => 'required|string',
+                    'extra_data.nilai_lama'            => 'required|string',
+                    'extra_data.nilai_baru'            => 'required|string',
                 ]);
                 break;
             case '2': // Input Nilai
@@ -135,7 +144,9 @@ class PengajuanSuratController extends Controller
             case '4': // Peminjaman Ruangan
                 $request->validate([
                     'extra_data.nama_kegiatan'      => 'required|string',
-                    'extra_data.tanggal_peminjaman' => 'required|date'
+                    'extra_data.tanggal_peminjaman' => 'required|date',
+                    'extra_data.waktu_mulai'        => 'required|string',
+                    'extra_data.waktu_selesai'      => 'required|string',
                 ]);
                 break;
             case '5': // Cuti
@@ -147,26 +158,35 @@ class PengajuanSuratController extends Controller
             case '6': // Pengambilan Data
                 $request->validate([
                     'extra_data.nim'          => 'required|string',
-                    'extra_data.tujuan_surat' => 'required|string'
+                    'extra_data.tujuan_surat' => 'required|string' // Field ini sudah ditambahkan di array create
                 ]);
                 break;
             case '7': // Magang
                 $request->validate([
-                    'extra_data.nim'           => 'required|string',
-                    'extra_data.nama_instansi' => 'required|string'
+                    'extra_data.nim'                    => 'required|string',
+                    'extra_data.nama_instansi'          => 'required|string',
+                    'extra_data.tanggal_mulai_magang'   => 'required|date',
+                    'extra_data.tanggal_selesai_magang' => 'required|date',
                 ]);
                 break;
             case '8': // TOEFL
-                $request->validate(['extra_data.nim' => 'required|string']);
+                $request->validate([
+                    'extra_data.nim'                   => 'required|string',
+                    'extra_data.tanggal_seminar_hasil' => 'required|date',
+                    'extra_data.periode_wisuda'        => 'required|string',
+                ]);
                 break;
             case '9': // Pengunduran Diri
-                $request->validate(['extra_data.nim' => 'required|string']);
+                $request->validate([
+                    'extra_data.nim'      => 'required|string',
+                    'extra_data.semester' => 'required|numeric',
+                ]);
                 break;
             case '10': // Surat Perjanjian
                 $request->validate([
                     'extra_data.nim'           => 'required|string',
-                    'extra_data.tanggal_awal'  => 'required|date',  // Sesuai placeholder ${tanggal_awal}
-                    'extra_data.tanggal_akhir' => 'required|date',  // Sesuai placeholder ${tanggal_akhir}
+                    'extra_data.tanggal_awal'  => 'required|date',
+                    'extra_data.tanggal_akhir' => 'required|date',
                 ], [
                     'extra_data.nim.required'           => 'NIM wajib diisi.',
                     'extra_data.tanggal_awal.required'  => 'Tanggal awal wajib diisi.',
@@ -178,33 +198,36 @@ class PengajuanSuratController extends Controller
                 break;
             case '12': // Pindah Kuliah
                 $request->validate([
-                    'extra_data.nim'      => 'required|string',
-                    'extra_data.semester' => 'required|numeric'
+                    'extra_data.nim'          => 'required|string',
+                    'extra_data.semester'     => 'required|numeric',
+                    // 🔥 PERBAIKAN: Menambahkan validasi prodi tujuan
+                    'extra_data.prodi_tujuan' => 'required|string',
                 ]);
                 break;
             case '13': // Remedial
                 $request->validate([
-                    'extra_data.nim'                => 'required|string',
-                    'extra_data.nama_matakuliah'    => 'required|string',
-                    'extra_data.kode_matakuliah'    => 'required|string',
-                    'extra_data.sks'                => 'required|numeric',
-                    'extra_data.dosen_remedial'     => 'required|string', // TAMBAHAN BARU
+                    'extra_data.nim'             => 'required|string',
+                    'extra_data.nama_matakuliah' => 'required|string',
+                    'extra_data.kode_matakuliah' => 'required|string',
+                    'extra_data.sks'             => 'required|numeric',
+                    'extra_data.dosen_remedial'  => 'required|string',
                 ]);
                 break;
             case '14': // Usulan UKT
                 $request->validate([
-                    'extra_data.nim'      => 'required|string',
-                    'extra_data.semester' => 'required|string'
+                    'extra_data.nim'                => 'required|string',
+                    'extra_data.semester'           => 'required|string',
+                    'extra_data.jumlah_sks_diambil' => 'required|numeric',
                 ]);
                 break;
             case '15': // SKL
                 $request->validate([
-                    'extra_data.nim'           => 'required|string',
-                    'extra_data.jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
-                    'extra_data.judul_skripsi' => 'required|string',
-                    'extra_data.pembimbing_1'  => 'required|string',
-                    'extra_data.pembimbing_2'  => 'required|string',
-                    'extra_data.tanggal_ujian' => 'required|date',
+                    'extra_data.nim'            => 'required|string',
+                    'extra_data.jenis_kelamin'  => 'required|in:Laki-laki,Perempuan',
+                    'extra_data.judul_skripsi'  => 'required|string',
+                    'extra_data.pembimbing_1'   => 'required|string',
+                    'extra_data.pembimbing_2'   => 'required|string',
+                    'extra_data.tanggal_ujian'  => 'required|date',
                 ]);
                 break;
         }
@@ -221,6 +244,7 @@ class PengajuanSuratController extends Controller
             'file_path'      => $filePath,
             'status'         => 'pending',
             'extra_data'     => $request->extra_data,
+            // Default is_read biasanya false, diurus database default value
         ]);
 
         return redirect()->route('dashboard')->with('success', 'Surat berhasil diajukan dan sedang menunggu persetujuan.');
