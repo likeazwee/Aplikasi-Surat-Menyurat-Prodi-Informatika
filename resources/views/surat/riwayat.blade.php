@@ -1,7 +1,6 @@
 <x-app-layout>
     <div class="min-h-screen bg-white text-gray-800 px-6 py-10 font-sans relative overflow-x-hidden">
 
-        <!-- 🔹 Header -->
         <div class="max-w-7xl mx-auto mb-10 text-center animate-fadeInSlow">
             <h1 class="text-5xl font-extrabold mb-3 tracking-tight text-blue-900">
                 <i class="fa-solid fa-clock-rotate-left text-blue-700 mr-2"></i> Riwayat Pengajuan Surat
@@ -12,7 +11,6 @@
             </p>
         </div>
 
-        <!-- 🔹 Statistik (Tetap Putih) -->
         <div class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-14 animate-slideIn">
             @php
                 $stats = [
@@ -41,35 +39,60 @@
             @endforeach
         </div>
 
-        <!-- 🔹 Daftar Surat (Card Navy Profesional) -->
         <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @forelse ($pengajuanSurats as $surat)
-                <div class="p-6 rounded-2xl bg-gradient-to-br from-blue-950 to-blue-800 text-white 
-                            shadow-md hover:shadow-lg transition-all transform hover:-translate-y-1 duration-300 animate-fadeIn border border-blue-900/40">
-                    <div class="flex justify-between items-start mb-4">
-                        <h3 class="font-semibold text-lg leading-tight">
-                            {{ $surat->jenisSurat->nama_surat ?? 'Jenis Surat Tidak Ditemukan' }}
-                        </h3>
-                        <span class="px-3 py-1 rounded-full text-xs font-medium uppercase tracking-wide
-                            {{ $surat->status === 'disetujui' ? 'bg-green-200 text-green-800' : 
-                               ($surat->status === 'ditolak' ? 'bg-red-200 text-red-800' : 'bg-yellow-200 text-yellow-800') }}">
-                            {{ ucfirst($surat->status) }}
-                        </span>
+                {{-- Container Relative agar link utama bisa full cover --}}
+                <div class="relative p-6 rounded-2xl bg-gradient-to-br from-blue-950 to-blue-800 text-white 
+                            shadow-md hover:shadow-xl transition-all transform hover:-translate-y-1 duration-300 animate-fadeIn border border-blue-900/40 group">
+                    
+                    {{-- 🔥 LINK UTAMA KE DETAIL SURAT (Cover seluruh kartu) --}}
+                    <a href="{{ route('surat.show', $surat->id) }}" class="absolute inset-0 z-0"></a>
+
+                    <div class="relative z-10 pointer-events-none"> {{-- pointer-events-none agar klik tembus ke link utama --}}
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="font-semibold text-lg leading-tight pr-2">
+                                {{ $surat->jenisSurat->nama_surat ?? 'Jenis Surat Tidak Ditemukan' }}
+                            </h3>
+                            <span class="px-3 py-1 rounded-full text-xs font-medium uppercase tracking-wide whitespace-nowrap
+                                {{ $surat->status === 'disetujui' ? 'bg-green-200 text-green-800' : 
+                                   ($surat->status === 'ditolak' ? 'bg-red-200 text-red-800' : 'bg-yellow-200 text-yellow-800') }}">
+                                {{ ucfirst($surat->status) }}
+                            </span>
+                        </div>
+
+                        <p class="text-sm text-blue-200 mb-1">📅 Tanggal Pengajuan</p>
+                        <p class="font-medium mb-3">
+                            {{ $surat->created_at->translatedFormat('d F Y') }}
+                        </p>
+
+                        {{-- Indikator Komentar (Jika ada) --}}
+                        @if($surat->komentars->count() > 0)
+                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-white/10 text-yellow-300 text-xs font-semibold mb-4">
+                                <i class="fa-regular fa-comments"></i> {{ $surat->komentars->count() }} Komentar
+                            </div>
+                        @else
+                            <div class="h-6 mb-4"></div> {{-- Spacer biar tinggi kartu rata --}}
+                        @endif
                     </div>
 
-                    <p class="text-sm text-blue-200 mb-1">📅 Tanggal Pengajuan</p>
-                    <p class="font-medium mb-3">
-                        {{ $surat->created_at->translatedFormat('d F Y') }}
-                    </p>
+                    {{-- Footer Card --}}
+                    <div class="relative z-20 flex justify-between items-center mt-2 pt-4 border-t border-blue-700/50">
+                        {{-- Teks CTA ke Detail --}}
+                        <span class="text-xs text-blue-300 group-hover:text-white transition underline decoration-dashed pointer-events-none">
+                            Lihat Detail & Komentar
+                        </span>
 
-                    @if ($surat->file_path)
-                        <a href="{{ Storage::url($surat->file_path) }}" target="_blank"
-                           class="inline-flex items-center gap-2 text-sm font-medium text-blue-200 hover:text-white transition-all">
-                            <i class="fa-solid fa-paperclip"></i> Lihat File
-                        </a>
-                    @else
-                        <p class="text-sm text-blue-300 italic">Tidak ada file</p>
-                    @endif
+                        {{-- Tombol File (Z-Index tinggi agar bisa diklik terpisah) --}}
+                        @if ($surat->file_path)
+                            <a href="{{ Storage::url($surat->file_path) }}" target="_blank"
+                               class="inline-flex items-center gap-2 text-xs font-bold bg-blue-700 hover:bg-blue-600 text-white px-3 py-1.5 rounded-lg transition-all shadow-sm">
+                                <i class="fa-solid fa-paperclip"></i> File
+                            </a>
+                        @else
+                            <span class="text-xs text-blue-400 italic">Tanpa File</span>
+                        @endif
+                    </div>
+
                 </div>
             @empty
                 <div class="col-span-3 text-center text-gray-400 py-10 text-lg">
@@ -79,7 +102,6 @@
             @endforelse
         </div>
 
-        <!-- 🔹 Pagination -->
         @if ($pengajuanSurats->hasPages())
             <div class="mt-16 flex flex-col md:flex-row items-center justify-between gap-4 text-gray-700">
                 <p class="text-sm">
@@ -118,7 +140,6 @@
         @endif
     </div>
 
-    <!-- ✨ Animations -->
     <style>
         @keyframes fadeIn { from {opacity: 0; transform: translateY(10px);} to {opacity: 1; transform: translateY(0);} }
         @keyframes fadeInSlow { from {opacity: 0; transform: translateY(20px);} to {opacity: 1; transform: translateY(0);} }
@@ -128,6 +149,5 @@
         .animate-slideIn { animation: slideIn 0.6s ease forwards; }
     </style>
 
-    <!-- Font Awesome -->
     <script src="https://kit.fontawesome.com/a2d9d5a64a.js" crossorigin="anonymous"></script>
 </x-app-layout>
