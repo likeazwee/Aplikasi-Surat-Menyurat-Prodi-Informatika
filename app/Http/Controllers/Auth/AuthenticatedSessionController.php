@@ -26,11 +26,10 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
-
         $request->session()->regenerate();
 
-        // --- LOGIKA REDIRECT BERDASARKAN ROLE ---
-        $user = $request->user();
+        // --- TAMBAHKAN LOGIKA REDIRECT BERDASARKAN ROLE DI SINI ---
+        $user = Auth::user();
 
         if ($user->role === 'admin') {
             return redirect()->intended(route('admin.dashboard'));
@@ -38,7 +37,7 @@ class AuthenticatedSessionController extends Controller
             return redirect()->intended(route('kaprodi.dashboard'));
         }
 
-        // Default redirect untuk mahasiswa
+        // Default untuk mahasiswa
         return redirect()->intended(RouteServiceProvider::HOME);
     }
 
