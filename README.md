@@ -1,1 +1,1 @@
-Sedang Masa Pengerjaan 
+Surat Menyurat Prodi Informatika Universitas Bengkulu
